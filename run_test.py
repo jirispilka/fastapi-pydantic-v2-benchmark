@@ -36,6 +36,7 @@ for name, file in itertools.product(FUNCS, files):
         results[file] = {name: v}
 
 
+from tabulate import tabulate
 pd.set_option("display.max_columns", None)
 df = pd.DataFrame(results)
-print(df.to_markdown())
+print(df.to_markdown(floatfmt=".0f"))

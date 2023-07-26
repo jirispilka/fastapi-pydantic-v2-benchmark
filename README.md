@@ -19,10 +19,10 @@ Change the version of pydantic to pydantic `>=2.0.0` and run then `pipenv update
 
 # Benchmark data
 
-[data_1kb.json](data%2Fdata_1kb.json)
-[data_1mb.json](data%2Fdata_1mb.json)
-[data_10kb.json](data%2Fdata_10kb.json)
-[data_100kb.json](data%2Fdata_100kb.json)
+[data_1kb.json](data%2Fdata_1kb.json)  
+[data_1mb.json](data%2Fdata_1mb.json)  
+[data_10kb.json](data%2Fdata_10kb.json)  
+[data_100kb.json](data%2Fdata_100kb.json)  
 
 Example of data_1kb.json (reformatted with a new line characters for better readability)
 
@@ -74,12 +74,29 @@ Example of data_1kb.json (reformatted with a new line characters for better read
 
 # Versions - pydantic v1
 
+HW:
+```text
+CPU: 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz
+```
+
+## pydantic v1
 ```text
 fastapi==0.100.0
 httpcore==0.17.3
 httptools==0.6.0
 orjson==3.9.2
 pydantic==1.10.12
+starlette==0.27.0
+```
+
+## pydantic v2
+```text
+fastapi==0.100.0
+httpcore==0.17.3
+httptools==0.6.0
+orjson==3.9.2
+pydantic==2.1.1
+pydantic_core==2.4.0
 starlette==0.27.0
 ```
 
@@ -125,21 +142,31 @@ Here's what each endpoint does:
 - `7_return__pydantic__pydantic__orjson`: Call `model.dict()` and return dict using orjson library
 - `8_return__pydantic__pydantic__pydantic_json_response`: Call `model.json()` and return it
 
-# Results - pydantic v1
+# Results in milliseconds (lower is better) - pydantic v1
 
-|                                                      |     1kb |    10kb |    100kb |       1mb |
-|:-----------------------------------------------------|--------:|--------:|---------:|----------:|
-| 1_return__dict__none__none                           | 1.66281 | 2.9067  | 14.7097  | 102.671   |
-| 2_return__dict__pydantic__none                       | 1.9647  | 5.76737 | 31.8653  | 274.063   |
-| 3_return__pydantic__pydantic__none                   | 2.04411 | 6.55592 | 36.0848  | 310.649   |
-| 4_return__dict__pydantic__json                       | 1.63163 | 1.63558 |  2.52545 |  10.5446  |
-| 5_return__dict__none__orjson                         | 1.66248 | 1.59695 |  2.61254 |   3.24839 |
-| 6_return__dict__pydantic__orjson                     | 1.60255 | 1.62431 |  1.79558 |   3.24175 |
-| 7_return__pydantic__pydantic__orjson                 | 1.80688 | 2.83686 | 10.8241  |  69.3623  |
-| 8_return__pydantic__pydantic__pydantic_json_response | 1.86001 | 3.00914 | 11.8573  |  79.4627  |
+|                                                      |   1kb |   10kb |   100kb |   1mb |
+|:-----------------------------------------------------|------:|-------:|--------:|------:|
+| 1_return__dict__none__none                           |     2 |      3 |      13 |    97 |
+| 2_return__dict__pydantic__none                       |     2 |      6 |      31 |   261 |
+| 3_return__pydantic__pydantic__none                   |     2 |      7 |      38 |   311 |
+| 4_return__dict__pydantic__json                       |     2 |      2 |       2 |    12 |
+| 5_return__dict__none__orjson                         |     2 |      2 |       2 |     4 |
+| 6_return__dict__pydantic__orjson                     |     2 |      2 |       2 |     3 |
+| 7_return__pydantic__pydantic__orjson                 |     2 |      3 |      10 |    68 |
+| 8_return__pydantic__pydantic__pydantic_json_response |     2 |      3 |      11 |    81 |
 
+# Results in milliseconds (lower is better) - pydantic v2
 
-# Results - pydantic v2
+|                                                      |   1kb |   10kb |   100kb |   1mb |
+|:-----------------------------------------------------|------:|-------:|--------:|------:|
+| 1_return__dict__none__none                           |     2 |      2 |      10 |    68 |
+| 2_return__dict__pydantic__none                       |     2 |      2 |       3 |    27 |
+| 3_return__pydantic__pydantic__none                   |     2 |      2 |       3 |    15 |
+| 4_return__dict__pydantic__json                       |     2 |      2 |       3 |    11 |
+| 5_return__dict__none__orjson                         |     2 |      2 |       2 |     3 |
+| 6_return__dict__pydantic__orjson                     |     2 |      2 |       2 |     3 |
+| 7_return__pydantic__pydantic__orjson                 |     2 |      2 |       2 |    10 |
+| 8_return__pydantic__pydantic__pydantic_json_response |     2 |      2 |       2 |     5 |
 
 
 
