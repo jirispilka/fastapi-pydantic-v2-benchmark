@@ -142,7 +142,7 @@ Here's what each endpoint does:
 - `7_return__pydantic__pydantic__orjson`: Call `model.dict()` and return dict using orjson library
 - `8_return__pydantic__pydantic__pydantic_json_response`: Call `model.json()` and return it
 
-# Results in milliseconds (lower is better) - pydantic v1
+# Results in ms (lower is better) - pydantic v1
 
 |                                                      |   1kb |   10kb |   100kb |   1mb |
 |:-----------------------------------------------------|------:|-------:|--------:|------:|
@@ -155,7 +155,7 @@ Here's what each endpoint does:
 | 7_return__pydantic__pydantic__orjson                 |     2 |      3 |      10 |    68 |
 | 8_return__pydantic__pydantic__pydantic_json_response |     2 |      3 |      11 |    81 |
 
-# Results in milliseconds (lower is better) - pydantic v2
+# Results in ms (lower is better) - pydantic v2
 
 |                                                      |   1kb |   10kb |   100kb |   1mb |
 |:-----------------------------------------------------|------:|-------:|--------:|------:|
