@@ -72,7 +72,7 @@ Example of data_1kb.json (reformatted with a new line characters for better read
 }
 ```
 
-# Versions - pydantic v1
+# Versions
 
 HW:
 ```text
