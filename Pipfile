@@ -1,0 +1,18 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[requires]
+python_version = "3.11"
+
+[packages]
+fastapi = "*"
+httpx = "*"
+orjson = "*"
+pandas = "*"
+pydantic = ">=2.0.0"
+tabulate = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+
+[dev-packages]

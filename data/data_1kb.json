@@ -1,0 +1,43 @@
+{
+  "_id": "zNSjA3ONYySYXFut Cwo2iPq",
+  "business_name": "3ttf7M9Dv",
+  "created_at": "",
+  "updated_at": "",
+  "customers": [
+    {
+      "customer_id": "08auCb0H",
+      "mobile": "kH3auvXBi5",
+      "name": "aRXpkU",
+      "email": "",
+      "dob": "",
+      "created_at": "c 49f3aMKd",
+      "updated_at": "zAnUv0sDJy"
+    }
+  ],
+  "bookings": [
+    {
+      "booking_id": "4v0C3rd8U0h69f",
+      "service_name": "EHJMMF1JHxeK95M9VVh49U",
+      "date": "siTTpyjrw7",
+      "start_time": "XJ4JjU39",
+      "readable_booking": "e3RzIxLM7yMFi9K4w52zS5XYeYGWOwIOtsEIIcmjzqderP1m4edrIq5BQxqkvHXktcGYPHvuH",
+      "created_at": "0MdAo4LQ3d",
+      "updated_at": "IzF42ltRTq",
+      "num_of_customers": "",
+      "status": "F1PEiS",
+      "readable_booking_with_id": {
+        "text": "dECE6MItzRx03Bk23AOIHhrFJDB7USI7UBPaOXVV6cyrBDXb591NHV6 ANHrlIoopTLSjX OH",
+        "post_back": "pAIawNXs5EiVTy"
+      }
+    }
+  ],
+  "services": [
+    {
+      "service_id": "gPSMVWepaWc5EfCRNcLp",
+      "name": "AErs24kQfWeQWFt0Z",
+      "created_at": "wBPN7zQyiQyXDWvLRYMwry4R",
+      "updated_at": "cJMrtZT85L0K7f3rouXBoEZe"
+    }
+  ],
+  "resources": []
+}
