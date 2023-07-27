@@ -1,21 +1,28 @@
-# fastapi-pydantic-v2-benchmark
+# Fastapi-pydantic-v2-benchmark
 
 Understand how FastAPI is internally serializing JSON data when it is returned. Originally it was intended to explore
 serialization speed of fastapi with pydantic v1. Later, a comparison to fastapi with pydantic v2 was added.
 
-# Install
+*Conclusions:*
+
+Serialization with fastapi and pydantic v1 was quite slow in some cases due to validations performed to guarantee 
+a proper data are returned. Please see the detailed explanation below.
+
+With Pydantic v2, which incorporates pydantic-core written in Rust, the serialization performance from Pydantic models
+to dictionaries is significantly improved.
+
+# Install and run
 
 ```shell
 pipenv install
 ```
 
-## Install with pydantic-v1
+- *pydantic-v1*: In the Pipfile you need to setup pydantic lower than 2.0.0 `pydantic = "<=2.0.0"` and then run `pipenv update`
+- *pydantic-v2*: Change the version of pydantic to pydantic `>=2.0.0` and then run `pipenv update`
 
-In the Pipfile you need to setup pydantic lower than 2.0.0 `pydantic = "<=2.0.0"` and then run `pipenv update`
-
-## Install with pydantic-v2
-
-Change the version of pydantic to pydantic `>=2.0.0` and run then `pipenv update`
+```shell
+python3 run_test.py
+```
 
 # Benchmark data
 
@@ -100,6 +107,38 @@ pydantic_core==2.4.0
 starlette==0.27.0
 ```
 
+
+
+# Test functions and APIs
+
+Several combinations of returned data types, *response model*, and *response class* are created.
+For instance, in the simplest use case, one could return a plain Python dictionary without any specified response model
+or response class. This is henceforth referred to as `return_dict_none_none`.
+
+Python code:
+```text
+@router.get("/1_return__dict__none__none")
+def return__dict__none__none(file: files):
+    return DATA[file]
+```
+
+Alternatively, one could return a Pydantic model, with a response Pydantic model, and the default response class:
+```text
+@router.get("/3_return__pydantic__pydantic__none", response_model=BusinessModel)
+def return_pydantic_pydantic_none(file: files):
+    return DATA_OBJ[file]
+```
+
+Here's what each endpoint does:
+- `1_return__dict__none__none`: Fastapi calls `jsonable_encoder`, which takes dict and ensures that all fields (Enum, Path, datetime) are JSON serializable 
+- `2_return__dict__pydantic__none`: Fastapi creates a pydantic model in `prepare_response_content` based on response model then runs `jsonable_encoder` (calls model.dict() and again iterates over all fields and ensures that are JSON serializable)
+- `3_return__pydantic__pydantic__none`: Create python dictionary using `model.dict()` →  in `prepare_response_content` create pydantic model model based on response model definition →  run `jsonable_encoder` (calls `model.dict()` and again iterates over all fields and ensures that are JSON serializable)
+- `4_return__dict__pydantic__json`: Dump dict to JSON using a standard library 
+- `5_return__dict__none__orjson`: Dump dict to JSON using orjson library
+- `6_return__dict__pydantic__orjson`: Dump dict to JSON using orjson library (Response model is used only for openapi documentation)
+- `7_return__pydantic__pydantic__orjson`: Call `model.dict()` and return dict using orjson library
+- `8_return__pydantic__pydantic__pydantic_json_response`: Call `model.json()` and return it
+ 
 # Comments
 
  - `jsonable_encoder` is an internal fastapi function
@@ -113,61 +152,33 @@ starlette==0.27.0
       or taking over the wheel and doing things yourself. It's not great to have two ways to do things, but there's
       no other way to let you take the wheel, so we have to leave with that.
       Also, any data validation won't be done, and no additional headers or background tasks will be set
+   
+# Results in ms - pydantic v1
 
-# Test functions and APIs
+|                                                      | Returned data  | Response model | Response class |1kb |10kb |100kb | 1mb |
+|:-----------------------------------------------------|----------------|----------------|----------------|---:|----:|-----:|----:|
+| 1_return__dict__none__none                           | dict           | None           | Default        |  2 |   3 |   13 |  97 |
+| 2_return__dict__pydantic__none                       | dict           | None           | Default        |  2 |   6 |   31 | 261 |
+| 3_return__pydantic__pydantic__none                   | pydantic model | pydantic model | Default        |  2 |   7 |   38 | 311 |
+| 4_return__dict__pydantic__json                       | dict           | pydantic model | JSON           |  2 |   2 |    2 |  12 |
+| 5_return__dict__none__orjson                         | dict           | None           | OrJSON         |  2 |   2 |    2 |   4 |
+| 6_return__dict__pydantic__orjson                     | dict           | pydantic model | OrJSON         |  2 |   2 |    2 |   3 |
+| 7_return__pydantic__pydantic__orjson                 |  pydantic model| pydantic model | OrJSON         |  2 |   3 |   10 |  68 |
+| 8_return__pydantic__pydantic__pydantic_json_response |  pydantic model| pydantic model | PydanticJSON   |  2 |   3 |   11 |  81 |
+   
 
-Several combinations of returned data types, response model, and response class are created.
-For instance, in the simplest use case, one could return a plain Python dictionary without any specified response model
-or response class. This is henceforth referred to as `return_dict_none_none`.
+# Results in ms - pydantic v2
 
-Python code:
-```text
-@router.get("/1_return__dict__none__none")
-def return__dict__none__none(file: files):
-    return DATA[file]
-```
-Alternatively, one could return a Pydantic model, with a response Pydantic model, and the default response class:
-```text
-@router.get("/3_return__pydantic__pydantic__none", response_model=BusinessModel)
-def return_pydantic_pydantic_none(file: files):
-    return DATA_OBJ[file]
-```
-Here's what each endpoint does:
-- `1_return__dict__none__none`: Fastapi calls `jsonable_encoder`, which takes dict and ensures that all fields (Enum, Path, datetime) are JSON serializable 
-- `2_return__dict__pydantic__none`: Fastapi creates a pydantic model in `prepare_response_content` based on response model then runs `jsonable_encoder` (calls model.dict() and again iterates over all fields and ensures that are JSON serializable)
-- `3_return__pydantic__pydantic__none`: Create python dictionary using `model.dict()` →  in `prepare_response_content` create pydantic model model based on response model definition →  run `jsonable_encoder` (calls `model.dict()` and again iterates over all fields and ensures that are JSON serializable)
-- `4_return__dict__pydantic__json`: Dump dict to JSON using a standard library 
-- `5_return__dict__none__orjson`: Dump dict to JSON using orjson library
-- `6_return__dict__pydantic__orjson`: Dump dict to JSON using orjson library (Response model is used only for openapi documentation)
-- `7_return__pydantic__pydantic__orjson`: Call `model.dict()` and return dict using orjson library
-- `8_return__pydantic__pydantic__pydantic_json_response`: Call `model.json()` and return it
-
-# Results in ms (lower is better) - pydantic v1
-
-|                                                      |   1kb |   10kb |   100kb |   1mb |
-|:-----------------------------------------------------|------:|-------:|--------:|------:|
-| 1_return__dict__none__none                           |     2 |      3 |      13 |    97 |
-| 2_return__dict__pydantic__none                       |     2 |      6 |      31 |   261 |
-| 3_return__pydantic__pydantic__none                   |     2 |      7 |      38 |   311 |
-| 4_return__dict__pydantic__json                       |     2 |      2 |       2 |    12 |
-| 5_return__dict__none__orjson                         |     2 |      2 |       2 |     4 |
-| 6_return__dict__pydantic__orjson                     |     2 |      2 |       2 |     3 |
-| 7_return__pydantic__pydantic__orjson                 |     2 |      3 |      10 |    68 |
-| 8_return__pydantic__pydantic__pydantic_json_response |     2 |      3 |      11 |    81 |
-
-# Results in ms (lower is better) - pydantic v2
-
-|                                                      |   1kb |   10kb |   100kb |   1mb |
-|:-----------------------------------------------------|------:|-------:|--------:|------:|
-| 1_return__dict__none__none                           |     2 |      2 |      10 |    68 |
-| 2_return__dict__pydantic__none                       |     2 |      2 |       3 |    27 |
-| 3_return__pydantic__pydantic__none                   |     2 |      2 |       3 |    15 |
-| 4_return__dict__pydantic__json                       |     2 |      2 |       3 |    11 |
-| 5_return__dict__none__orjson                         |     2 |      2 |       2 |     3 |
-| 6_return__dict__pydantic__orjson                     |     2 |      2 |       2 |     3 |
-| 7_return__pydantic__pydantic__orjson                 |     2 |      2 |       2 |    10 |
-| 8_return__pydantic__pydantic__pydantic_json_response |     2 |      2 |       2 |     5 |
-
+|                                                      | Returned data  | Response model | Response class | 1kb |10kb |100kb |1mb |
+|:-----------------------------------------------------|----------------|----------------|----------------|----:|----:|-----:|---:|
+| 1_return__dict__none__none                           | dict           | None           | Default        |   2 |   2 |   10 | 68 |
+| 2_return__dict__pydantic__none                       | dict           | None           | Default        |   2 |   2 |    3 | 27 |
+| 3_return__pydantic__pydantic__none                   | pydantic model | pydantic model | Default        |   2 |   2 |    3 | 15 |
+| 4_return__dict__pydantic__json                       | dict           | pydantic model | JSON           |   2 |   2 |    3 | 11 |
+| 5_return__dict__none__orjson                         | dict           | None           | OrJSON         |   2 |   2 |    2 |  3 |
+| 6_return__dict__pydantic__orjson                     | dict           | pydantic model | OrJSON         |   2 |   2 |    2 |  3 |
+| 7_return__pydantic__pydantic__orjson                 |  pydantic model| pydantic model | OrJSON         |   2 |   2 |    2 | 10 |
+| 8_return__pydantic__pydantic__pydantic_json_response |  pydantic model| pydantic model | PydanticJSON   |   2 |   2 |    2 |  5 |
 
 
 # References:

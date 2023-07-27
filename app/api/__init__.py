@@ -66,9 +66,11 @@ def return__dict__pydantic__none(file: files):
 def return_pydantic_pydantic_none(file: files):
     return DATA_OBJ[file]
 
+
 @router.get("/4_return__dict__pydantic__json", response_model=BusinessModel)
 def return__dict__none__json(file: files):
     return JSONResponse(DATA[file])
+
 
 @router.get("/5_return__dict__none__orjson")
 def return__dict__none__json(file: files):
@@ -79,9 +81,11 @@ def return__dict__none__json(file: files):
 def return__dict__none__orjson(file: files):
     return ORJSONResponse(DATA[file])
 
+
 @router.get("/7_return__pydantic__pydantic__orjson", response_model=BusinessModel)
 def return__pydantic__pydantic__orjson(file: files):
     return ORJSONResponse(DATA_OBJ[file].dict())
+
 
 @router.get("/8_return__pydantic__pydantic__pydantic_json_response", response_model=BusinessModel)
 def return__dict__pydantic__orjson(file: files):
