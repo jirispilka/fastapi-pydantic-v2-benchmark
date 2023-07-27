@@ -130,14 +130,14 @@ def return_pydantic_pydantic_none(file: files):
 ```
 
 Here's what each endpoint does:
-- `1_return__dict__none__none`: Fastapi calls `jsonable_encoder`, which takes dict and ensures that all fields (Enum, Path, datetime) are JSON serializable 
-- `2_return__dict__pydantic__none`: Fastapi creates a pydantic model in `prepare_response_content` based on response model then runs `jsonable_encoder` (calls model.dict() and again iterates over all fields and ensures that are JSON serializable)
-- `3_return__pydantic__pydantic__none`: Create python dictionary using `model.dict()` →  in `prepare_response_content` create pydantic model model based on response model definition →  run `jsonable_encoder` (calls `model.dict()` and again iterates over all fields and ensures that are JSON serializable)
-- `4_return__dict__pydantic__json`: Dump dict to JSON using a standard library 
-- `5_return__dict__none__orjson`: Dump dict to JSON using orjson library
-- `6_return__dict__pydantic__orjson`: Dump dict to JSON using orjson library (Response model is used only for openapi documentation)
-- `7_return__pydantic__pydantic__orjson`: Call `model.dict()` and return dict using orjson library
-- `8_return__pydantic__pydantic__pydantic_json_response`: Call `model.json()` and return it
+- `1_dict__none__none`: Fastapi calls `jsonable_encoder`, which takes dict and ensures that all fields (Enum, Path, datetime) are JSON serializable 
+- `2_dict__pydantic__none`: Fastapi creates a pydantic model in `prepare_response_content` based on response model then runs `jsonable_encoder` (calls model.dict() and again iterates over all fields and ensures that are JSON serializable)
+- `3_pydantic__pydantic__none`: Create python dictionary using `model.dict()` →  in `prepare_response_content` create pydantic model model based on response model definition →  run `jsonable_encoder` (calls `model.dict()` and again iterates over all fields and ensures that are JSON serializable)
+- `4_dict__pydantic__json`: Dump dict to JSON using a standard library 
+- `5_dict__none__orjson`: Dump dict to JSON using orjson library
+- `6_dict__pydantic__orjson`: Dump dict to JSON using orjson library (Response model is used only for openapi documentation)
+- `7_pydantic__pydantic__orjson`: Call `model.dict()` and return dict using orjson library
+- `8_pydantic__pydantic__pydantic_json_response`: Call `model.json()` and return it
  
 # Comments
 
@@ -155,30 +155,30 @@ Here's what each endpoint does:
    
 # Results in ms - pydantic v1
 
-|                                                      | Returned data  | Response model | Response class |1kb |10kb |100kb | 1mb |
-|:-----------------------------------------------------|----------------|----------------|----------------|---:|----:|-----:|----:|
-| 1_return__dict__none__none                           | dict           | None           | Default        |  2 |   3 |   13 |  97 |
-| 2_return__dict__pydantic__none                       | dict           | None           | Default        |  2 |   6 |   31 | 261 |
-| 3_return__pydantic__pydantic__none                   | pydantic model | pydantic model | Default        |  2 |   7 |   38 | 311 |
-| 4_return__dict__pydantic__json                       | dict           | pydantic model | JSON           |  2 |   2 |    2 |  12 |
-| 5_return__dict__none__orjson                         | dict           | None           | OrJSON         |  2 |   2 |    2 |   4 |
-| 6_return__dict__pydantic__orjson                     | dict           | pydantic model | OrJSON         |  2 |   2 |    2 |   3 |
-| 7_return__pydantic__pydantic__orjson                 |  pydantic model| pydantic model | OrJSON         |  2 |   3 |   10 |  68 |
-| 8_return__pydantic__pydantic__pydantic_json_response |  pydantic model| pydantic model | PydanticJSON   |  2 |   3 |   11 |  81 |
+|                                       | Returned data   | Response model | Response class |1kb |10kb |100kb | 1mb |
+|:--------------------------------------|-----------------|----------------|----------------|---:|----:|-----:|----:|
+| 1_dict__none__none                    | dict            | None           | Default        |  2 |   3 |   13 |  97 |
+| 2_dict__pydantic__none                | dict            | None           | Default        |  2 |   6 |   31 | 261 |
+| 3_pydantic__pydantic__none            | pydantic model  | pydantic model | Default        |  2 |   7 |   38 | 311 |
+| 4_dict__pydantic__json                | dict            | pydantic model | JSON           |  2 |   2 |    2 |  12 |
+| 5_dict__none__orjson                  | dict            | None           | OrJSON         |  2 |   2 |    2 |   4 |
+| 6_dict__pydantic__orjson              | dict            | pydantic model | OrJSON         |  2 |   2 |    2 |   3 |
+| 7_pydantic__pydantic__orjson          | pydantic model  | pydantic model | OrJSON         |  2 |   3 |   10 |  68 |
+| 8_pydantic__pydantic__pydantic_json_r | pydantic model  | pydantic model | PydanticJSON   |  2 |   3 |   11 |  81 |
    
 
 # Results in ms - pydantic v2
 
-|                                                      | Returned data  | Response model | Response class | 1kb |10kb |100kb |1mb |
-|:-----------------------------------------------------|----------------|----------------|----------------|----:|----:|-----:|---:|
-| 1_return__dict__none__none                           | dict           | None           | Default        |   2 |   2 |   10 | 68 |
-| 2_return__dict__pydantic__none                       | dict           | None           | Default        |   2 |   2 |    3 | 27 |
-| 3_return__pydantic__pydantic__none                   | pydantic model | pydantic model | Default        |   2 |   2 |    3 | 15 |
-| 4_return__dict__pydantic__json                       | dict           | pydantic model | JSON           |   2 |   2 |    3 | 11 |
-| 5_return__dict__none__orjson                         | dict           | None           | OrJSON         |   2 |   2 |    2 |  3 |
-| 6_return__dict__pydantic__orjson                     | dict           | pydantic model | OrJSON         |   2 |   2 |    2 |  3 |
-| 7_return__pydantic__pydantic__orjson                 |  pydantic model| pydantic model | OrJSON         |   2 |   2 |    2 | 10 |
-| 8_return__pydantic__pydantic__pydantic_json_response |  pydantic model| pydantic model | PydanticJSON   |   2 |   2 |    2 |  5 |
+|                                       | Returned data   | Response model | Response class | 1kb |10kb |100kb |1mb |
+|:--------------------------------------|-----------------|----------------|----------------|----:|----:|-----:|---:|
+| 1_dict__none__none                    | dict            | None           | Default        |   2 |   2 |   10 | 68 |
+| 2_dict__pydantic__none                | dict            | None           | Default        |   2 |   2 |    3 | 27 |
+| 3_pydantic__pydantic__none            | pydantic model  | pydantic model | Default        |   2 |   2 |    3 | 15 |
+| 4_dict__pydantic__json                | dict            | pydantic model | JSON           |   2 |   2 |    3 | 11 |
+| 5_dict__none__orjson                  | dict            | None           | OrJSON         |   2 |   2 |    2 |  3 |
+| 6_dict__pydantic__orjson              | dict            | pydantic model | OrJSON         |   2 |   2 |    2 |  3 |
+| 7_pydantic__pydantic__orjson          | pydantic model  | pydantic model | OrJSON         |   2 |   2 |    2 | 10 |
+| 8_pydantic__pydantic__pydantic_json_r | pydantic model  | pydantic model | PydanticJSON   |   2 |   2 |    2 |  5 |
 
 
 # References:
