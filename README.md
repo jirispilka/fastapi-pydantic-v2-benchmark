@@ -3,7 +3,7 @@
 Understand how FastAPI is internally serializing JSON data when it is returned. Originally it was intended to explore
 serialization speed of fastapi with pydantic v1. Later, a comparison to fastapi with pydantic v2 was added.
 
-*Conclusions:*
+**Conclusions:**
 
 Serialization with fastapi and pydantic v1 was quite slow in some cases due to validations performed to guarantee 
 a proper data are returned. Please see the detailed explanation below.
@@ -17,8 +17,8 @@ to dictionaries is significantly improved.
 pipenv install
 ```
 
-- *pydantic-v1*: In the Pipfile you need to setup pydantic lower than 2.0.0 `pydantic = "<=2.0.0"` and then run `pipenv update`
-- *pydantic-v2*: Change the version of pydantic to pydantic `>=2.0.0` and then run `pipenv update`
+- **pydantic-v1**: In the Pipfile you need to setup pydantic lower than 2.0.0 `pydantic = "<=2.0.0"` and then run `pipenv update`
+- **pydantic-v2**: Change the version of pydantic to pydantic `>=2.0.0` and then run `pipenv update`
 
 ```shell
 python3 run_test.py
@@ -111,7 +111,7 @@ starlette==0.27.0
 
 # Test functions and APIs
 
-Several combinations of returned data types, *response model*, and *response class* are created.
+Several combinations of returned data types, **response model**, and **response class** are created.
 For instance, in the simplest use case, one could return a plain Python dictionary without any specified response model
 or response class. This is henceforth referred to as `return_dict_none_none`.
 
@@ -146,8 +146,8 @@ Here's what each endpoint does:
  - `orjson` - library to serialize dict to json written in rust
  - `ORJSONResponse`
    - skips fastapi internals like validation, serialization
-    - comment from the fastapi maintainer (reference missing): "Yep, returning responses directly is an escape hatch 
-      for you to override anything FastAPI would do and take over directly. It is not intended as the main use case.
+    - comment from the fastapi maintainer (tiangolo?) (reference missing): "Yep, returning responses directly is 
+      an escape hatch for you to override anything FastAPI would do and take over directly. It is not intended as the main use case.
       And yes, this means there are two ways to do things, do them through the normal ways, returning data directly,
       or taking over the wheel and doing things yourself. It's not great to have two ways to do things, but there's
       no other way to let you take the wheel, so we have to leave with that.
