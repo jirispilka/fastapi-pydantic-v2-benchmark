@@ -17,8 +17,8 @@ to dictionaries is significantly improved.
 pipenv install
 ```
 
-- **pydantic-v1**: In the Pipfile you need to setup pydantic lower than 2.0.0 `pydantic = "<=2.0.0"` and then run `pipenv update`
-- **pydantic-v2**: Change the version of pydantic to pydantic `>=2.0.0` and then run `pipenv update`
+- **pydantic-v1**: In the Pipfile you need to setup pydantic lower than 2.0.0 `pydantic = "<2"` and then run `pipenv update`
+- **pydantic-v2**: Change the version of pydantic to pydantic `>=2` and then run `pipenv update`
 
 ```shell
 python3 run_test.py
